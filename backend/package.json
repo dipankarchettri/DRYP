@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "node ../tests/api.test.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

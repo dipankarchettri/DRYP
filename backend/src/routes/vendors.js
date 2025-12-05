@@ -89,7 +89,9 @@ router.get('/me', protect, async (req, res, next) => {
     if (req.user.role !== 'vendor') {
       return res.status(403).json({ message: 'Forbidden: Only vendors can access this route' });
     }
+    console.log('Searching for vendor with owner ID:', req.user._id);
     const vendor = await Vendor.findOne({ owner: req.user._id });
+    console.log('Found vendor:', vendor);
     if (!vendor) {
       return res.status(404).json({ message: 'Vendor profile not found for this user' });
     }

@@ -13,11 +13,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import { useCustomRouter } from '../../src/hooks/useCustomRouter';
+import { VendorHeader } from '../../src/components/vendor/Header';
 import { useAuthStore } from '../../src/state/auth';
 import { apiCall } from '../../src/lib/api';
 import { Ionicons } from '@expo/vector-icons';
-
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://192.168.1.9:5000';
 
 export default function StoreProfileScreen() {
   const { user, logout } = useAuthStore();
@@ -105,12 +104,7 @@ export default function StoreProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{isEditing ? 'Edit Profile' : 'Store Profile'}</Text>
-        <Pressable onPress={() => setIsEditing(!isEditing)} style={styles.editButton}>
-          <Ionicons name={isEditing ? 'close' : 'pencil'} size={24} color="#fff" />
-        </Pressable>
-      </View>
+      <VendorHeader title={isEditing ? 'Edit Profile' : 'Store Profile'} />
       <ScrollView contentContainerStyle={styles.content}>
         {isEditing ? (
           // EDITING VIEW
@@ -140,7 +134,7 @@ export default function StoreProfileScreen() {
           <View style={styles.profileDetails}>
             <Image
               style={styles.logo}
-              source={vendor.logo ? { uri: `${API_BASE_URL}${vendor.logo}` } : require('../../assets/casa_denim.jpg')}
+              source={vendor.logo ? { uri: vendor.logo } : require('../../assets/casa_denim.jpg')}
             />
             <Text style={styles.vendorName}>{vendor.name}</Text>
             <Text style={styles.vendorDescription}>{vendor.description}</Text>
@@ -170,16 +164,6 @@ export default function StoreProfileScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 24,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  title: { fontSize: 28, fontWeight: 'bold' },
   editButton: {
     backgroundColor: '#1a1a1a',
     borderRadius: 20,

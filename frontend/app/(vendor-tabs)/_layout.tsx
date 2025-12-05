@@ -27,6 +27,14 @@ export default function VendorTabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: '#1a1a1a',
+        tabBarStyle: {
+          height: 60,
+          paddingBottom: 10,
+          paddingTop: 10,
+        },
+        tabBarLabelStyle: {
+          fontFamily: 'Zaloga',
+        },
       }}
     >
       <Tabs.Screen

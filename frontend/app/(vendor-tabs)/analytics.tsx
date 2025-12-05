@@ -5,6 +5,7 @@ import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../src/state/auth';
 import { apiCall } from '../../src/lib/api';
+import { VendorHeader } from '../../src/components/vendor/Header';
 import { formatPrice } from '../../src/utils/formatting';
 
 const screenWidth = Dimensions.get('window').width;
@@ -69,9 +70,7 @@ export default function AnalyticsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Dashboard</Text>
-      </View>
+      <VendorHeader title="Dashboard" />
       <ScrollView 
         contentContainerStyle={styles.scrollContent}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={fetchAnalytics} />}
@@ -144,8 +143,6 @@ export default function AnalyticsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f8f9fa' },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8f9fa' },
-  header: { padding: 24, backgroundColor: '#ffffff', borderBottomWidth: 1, borderBottomColor: '#e0e0e0' },
-  title: { fontSize: 28, fontWeight: 'bold', color: '#1a1a1a' },
   errorText: { color: 'red', fontSize: 16 },
   scrollContent: { padding: 12 },
   

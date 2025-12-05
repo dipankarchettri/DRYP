@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, FlatList, ActivityIndicator, Pressable } from '
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import { apiCall } from '../../src/lib/api';
+import { VendorHeader } from '../../src/components/vendor/Header';
 import { useAuthStore } from '../../src/state/auth';
 
 export default function VendorOrdersScreen() {
@@ -93,9 +94,7 @@ export default function VendorOrdersScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Your Orders</Text>
-      </View>
+      <VendorHeader title="Your Orders" />
       <FlatList
         data={orders}
         renderItem={renderOrderItem}
@@ -111,8 +110,6 @@ export default function VendorOrdersScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f8f9fa' },
-  header: { padding: 24, backgroundColor: '#ffffff', borderBottomWidth: 1, borderBottomColor: '#e0e0e0' },
-  title: { fontSize: 28, fontWeight: 'bold' },
   list: { padding: 16 },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   retryText: { color: 'blue', marginTop: 10 },

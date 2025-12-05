@@ -14,6 +14,7 @@ import TextTicker from 'react-native-text-ticker';
 import { useAuthStore } from '../src/state/auth';
 import { apiCall } from '../src/lib/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { VendorHeader } from '../src/components/vendor/Header';
 import { useCustomRouter } from '../src/hooks/useCustomRouter';
 
 export default function VendorRegisterScreen() {
@@ -83,8 +84,7 @@ export default function VendorRegisterScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-        <Text style={styles.logo}>DRYP</Text>
+        <VendorHeader title="Become a Vendor" />
         <TextTicker
           style={styles.marqueeText}
           duration={15000}
@@ -94,9 +94,7 @@ export default function VendorRegisterScreen() {
         >
           STREETWEAR • MODERN ESSENTIALS • HANDCRAFT • PREMIUM
         </TextTicker>
-        </View>
         <View style={styles.header}>
-          <Text style={styles.title}>Become a Vendor</Text>
           <Text style={styles.subtitle}>Create your storefront on DR-YP</Text>
         </View>
 
@@ -156,12 +154,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#ffffff' },
   scrollContent: { padding: 24 },
   header: { alignItems: 'center', marginBottom: 24 },
-  logo: {
-    fontSize: 80,
-    fontFamily: 'Zaloga',
-    color: '#1a1a1a',
-    textAlign: 'center',
-  },
   marqueeText: {
     fontSize: 16,
     fontFamily: 'Zaloga',
@@ -169,7 +161,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 10,
   },
-  title: { fontSize: 28, fontFamily: 'Zaloga', color: '#1a1a1a' },
   subtitle: { fontSize: 16, color: '#666666', marginTop: 4, fontFamily: 'Zaloga' },
   formSection: { marginBottom: 24 },
   sectionTitle: { fontSize: 18, fontFamily: 'Zaloga', color: '#1a1a1a', marginBottom: 12 },

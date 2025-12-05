@@ -44,11 +44,12 @@ router.get('/', async (req, res, next) => {
       if (minPrice) filter.basePrice.$gte = Number(minPrice);
       if (maxPrice) filter.basePrice.$lte = Number(maxPrice);
     }
-
+    console.log('Fetching products with filter:', filter);
     const products = await Product.find(filter)
       .populate({ path: 'vendor', select: 'name' })
       .limit(50)
       .sort({ createdAt: -1 });
+    console.log('Found products:', products.length);
     res.json(products);
   } catch (error) {
     next(error);

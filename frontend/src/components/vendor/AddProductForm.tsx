@@ -53,7 +53,7 @@ export const AddProductForm = ({ visible, onClose, onProductAdded }) => {
   
       if (!result.canceled) {
         setIsUploading(true);
-        const uploadedUrls = [];
+        const uploadedImageObjects = [];
         for (const asset of result.assets) {
           const formData = new FormData();
           const uriParts = asset.uri.split('.');
@@ -73,8 +73,8 @@ export const AddProductForm = ({ visible, onClose, onProductAdded }) => {
                 'Content-Type': 'multipart/form-data',
               },
             });
-            if (res.url) {
-              uploadedUrls.push(res.url);
+            if (res.url && res.publicId) {
+              uploadedImageObjects.push({ url: res.url, publicId: res.publicId });
             } else {
               Alert.alert('Upload Failed', res.message || 'Could not upload image.');
             }
@@ -83,7 +83,7 @@ export const AddProductForm = ({ visible, onClose, onProductAdded }) => {
           }
         }
         const newVariants = [...variants];
-        newVariants[variantIndex].images.push(...uploadedUrls);
+        newVariants[variantIndex].images.push(...uploadedImageObjects);
         setVariants(newVariants);
         setIsUploading(false);
       }
@@ -197,7 +197,7 @@ export const AddProductForm = ({ visible, onClose, onProductAdded }) => {
   
                 <Text style={formStyles.subtitle}>Variant Images</Text>
                 <View style={formStyles.imagePreviewContainer}>
-                  {variant.images.map((uri, imgIndex) => <Image key={imgIndex} source={{ uri }} style={formStyles.imagePreview} />)}
+                  {variant.images.map((image, imgIndex) => <Image key={imgIndex} source={{ uri: image.url }} style={formStyles.imagePreview} />)}
                 </View>
                 <Button title="Add Variant Images" onPress={() => handleVariantImagePick(index)} />
               </View>

@@ -74,7 +74,7 @@ export default function ManageProductsScreen() {
 
   const renderItem = ({ item }) => (
     <View style={styles.productItem}>
-      <Image source={{ uri: item.images[0] }} style={styles.productImage} />
+      <Image source={{ uri: item.images[0]?.url }} style={styles.productImage} />
       <View style={styles.productInfo}>
         <Text style={styles.productName}>{item.name}</Text>
         <Text style={styles.productDetails}>Price: ${item.basePrice.toFixed(2)}</Text>

@@ -50,7 +50,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ productId, isVi
   const [loading, setLoading] = useState(true);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [displayImages, setDisplayImages] = useState<string[]>([]);
+  const [displayImages, setDisplayImages] = useState<{ url: string; publicId: string }[]>([]);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [recentlyAddedToCart, setRecentlyAddedToCart] = useState<Set<string>>(new Set());
   const [isProductInWishlist, setIsProductInWishlist] = useState(false);
@@ -199,7 +199,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ productId, isVi
       removeFromCart(cartId);
     } else {
       const itemPrice = selectedVariant?.price ?? product.basePrice;
-      const itemImage = selectedVariant?.images?.[0] || product.images[0];
+      const itemImage = selectedVariant?.images?.[0]?.url || product.images[0]?.url;
       
       addToCart({
         id: cartId,
@@ -285,8 +285,8 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ productId, isVi
       <ScrollView contentContainerStyle={[styles.detailsContent, { paddingBottom: bottomPadding }]} scrollEventThrottle={16} style={{ flex: 1 }} nestedScrollEnabled={true} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={true}>
         <View style={styles.imageWrapper}>
           <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} onScroll={onImageScroll} scrollEventThrottle={16} style={styles.detailsImageCarousel} nestedScrollEnabled={true} directionalLockEnabled={true}>
-            {displayImages.map((img: string, index: number) => (
-              <Image key={img || index} source={{ uri: `${API_BASE_URL}${img}` }} style={styles.detailsImage} resizeMode="cover" accessible accessibilityLabel={`Product image ${index + 1}`} />
+            {displayImages.map((img: { url: string; publicId: string }, index: number) => (
+              <Image key={img.publicId || index} source={{ uri: img.url }} style={styles.detailsImage} resizeMode="cover" accessible accessibilityLabel={`Product image ${index + 1}`} />
             ))}
           </ScrollView>
           {displayImages.length > 1 && renderImageIndicators()}

@@ -130,7 +130,7 @@ export default function ProductDetailScreen() {
                 productId: product._id,
                 title: product.name,
                 brand: product.brand,
-                image: product.images[0],
+                image: product.images[0]?.url,
                 price: selectedVariant ? selectedVariant.price : product.basePrice,
                 options: hasVariants ? selectedOptions : undefined,
                 quantity: 1,
@@ -168,7 +168,7 @@ export default function ProductDetailScreen() {
         <>
             <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} style={styles.imageCarousel}>
                 {product.images.map((img, index) => (
-                    <Image key={index} source={{ uri: `${API_BASE_URL}${img}` }} style={styles.productImage} />
+                    <Image key={index} source={{ uri: img.url }} style={styles.productImage} />
                 ))}
             </ScrollView>
             

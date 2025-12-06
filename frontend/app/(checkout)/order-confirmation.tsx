@@ -35,7 +35,7 @@ export default function OrderConfirmationScreen() {
   const renderOrderItem = ({ item }: { item: any }) => (
     <View style={styles.itemContainer}>
       <Image 
-        source={{ uri: `${API_BASE_URL}${item.product.images[0]}` }} 
+        source={{ uri: item.product.images[0]?.url }} 
         style={styles.itemImage} 
       />
       <View style={styles.itemInfo}>

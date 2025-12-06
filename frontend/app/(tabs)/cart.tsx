@@ -37,7 +37,7 @@ export default function CartScreen() {
         ...cartItem,
         price,
         options: newOptions,
-        image: newVariant?.images?.[0] || cartItem.image,
+        image: newVariant?.images?.[0]?.url || cartItem.image.url,
       });
     } else {
       console.warn("Selected variant not found or price is invalid");
@@ -135,7 +135,7 @@ export default function CartScreen() {
                                 setIsModalVisible(true);
                               }}>
                                 <View style={styles.itemCard}>
-                                  <Image source={{ uri: `${API_BASE_URL}${item.image}` }} style={styles.itemImage} />
+                                  <Image source={{ uri: item.image.url }} style={styles.itemImage} />
                                   <View style={styles.itemContent}>
                                     <View style={styles.itemHeader}>
                       <View style={styles.itemInfo}>

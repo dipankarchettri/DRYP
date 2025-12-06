@@ -25,8 +25,8 @@ const uploadImage = async (uri) => {
       body: formData,
     });
 
-    if (result && result.url) {
-      return result.url;
+    if (result && result.url && result.publicId) {
+      return { url: result.url, publicId: result.publicId };
     } else {
       Alert.alert('Upload Failed', result.message || 'Could not upload image.');
       return null;
@@ -272,9 +272,9 @@ export default function EditProductScreen() {
         <View style={styles.imageContainer}>
           <Text style={styles.subTitle}>Product Images</Text>
           <View style={styles.imageList}>
-            {product.images && product.images.map((url, index) => (
+            {product.images && product.images.map((image, index) => (
               <View key={index} style={{ position: 'relative' }}>
-                <Image source={{ uri: url }} style={styles.image} />
+                <Image source={{ uri: image.url }} style={styles.image} />
                 <Button title="X" onPress={() => removeMainImage(index)} />
               </View>
             ))}
@@ -348,9 +348,9 @@ export default function EditProductScreen() {
                 
                 {/* Variant Images */}
                 <View style={styles.imageList}>
-                  {variant.images.map((imgUrl, imgIndex) => (
+                  {variant.images.map((img, imgIndex) => (
                     <View key={imgIndex} style={{ position: 'relative' }}>
-                      <Image source={{ uri: imgUrl }} style={styles.image} />
+                      <Image source={{ uri: img.url }} style={styles.image} />
                       <Button title="X" onPress={() => removeVariantImage(index, imgIndex)} />
                     </View>
                   ))}

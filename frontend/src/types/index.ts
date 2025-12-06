@@ -20,7 +20,7 @@ export interface ProductVariant {
   options: { [key: string]: string };
   price: number;
   stock: number;
-  images?: string[];
+  images?: { url: string; publicId: string }[];
 }
 
 export interface ProductOption {
@@ -34,7 +34,7 @@ export interface Product {
   description: string;
   brand: string;
   category: string;
-  images: string[];
+  images: { url: string; publicId: string }[];
   basePrice: number;
   stock: number;
   options?: ProductOption[];

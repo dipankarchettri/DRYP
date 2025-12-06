@@ -38,7 +38,7 @@ const VariantSelectionModal: React.FC<VariantSelectionModalProps> = ({ cartItem,
   const [selectedOptions, setSelectedOptions] = useState<Record<string, any>>({});
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [displayImages, setDisplayImages] = useState<string[]>([]);
+  const [displayImages, setDisplayImages] = useState<{ url: string; publicId: string }[]>([]);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [isSizeDropdownOpen, setSizeDropdownOpen] = useState(false);
@@ -145,7 +145,7 @@ const VariantSelectionModal: React.FC<VariantSelectionModalProps> = ({ cartItem,
       productId: product._id,
       title: product.name,
       brand: product.brand,
-      image: selectedVariant.images?.[0] || product.images[0],
+      image: selectedVariant.images?.[0]?.url || product.images[0]?.url,
       price: price,
       options: { Size: selectedSize, Color: selectedColor },
     });

@@ -98,7 +98,7 @@ export default function OrdersScreen() {
             return (
               <View key={product._id} style={styles.productItem}>
                 <Image 
-                  source={{ uri: `${API_BASE_URL}${product.images[0]}` }} 
+                  source={{ uri: product.images[0]?.url }} 
                   style={styles.productImage} 
                 />
                 <View style={styles.productInfo}>

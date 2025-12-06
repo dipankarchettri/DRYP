@@ -1,13 +1,40 @@
 require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const mongoose = require('mongoose');
+const path = require('path');
+const cloudinary = require('cloudinary').v2;
 const connectDatabase = require('./src/config/database');
 const Product = require('./src/models/Product');
 const User = require('./src/models/User');
 
 const VENDOR_ID = '691dfd25d9164020524efb23';
-const PLACEHOLDER_IMAGE = '/uploads/seed-placeholder.jpg';
 
-const sampleProducts = [
+// Configure Cloudinary to use credentials from .env
+cloudinary.config({
+  secure: true,
+});
+
+// --- Helper function to upload placeholder image ---
+const uploadPlaceholderImage = async () => {
+  try {
+    const imagePath = path.join(__dirname, 'public', 'uploads', 'seed-placeholder.jpg');
+    console.log(`Uploading placeholder image from: ${imagePath}`);
+    
+    const result = await cloudinary.uploader.upload(imagePath, {
+      public_id: 'seed_placeholder', // Gives the image a consistent name in Cloudinary
+      folder: 'DRYP_PROD',
+      overwrite: true, // Overwrite if it already exists
+    });
+
+    console.log('Placeholder image uploaded to Cloudinary successfully.');
+    return result.secure_url; // This is the permanent HTTPS URL
+  } catch (error) {
+    console.error('Error uploading placeholder image to Cloudinary:', error);
+    throw error; // Stop the seeding process if upload fails
+  }
+};
+
+
+const createSampleProducts = (placeholderUrl) => [
   {
     name: 'Casa Denim Jacket',
     description: 'A timeless denim jacket for all seasons. Made with 100% organic cotton, this jacket features a classic button-front, two chest pockets, and a comfortable fit that layers perfectly over any outfit. A wardrobe staple for a reason.',
@@ -15,7 +42,7 @@ const sampleProducts = [
     category: 'Jackets',
     tags: ['Outerwear', 'Denim', 'Casual', 'Staple'],
     basePrice: 129.99,
-    images: [PLACEHOLDER_IMAGE],
+    images: [placeholderUrl],
     vendor: VENDOR_ID,
     isActive: true,
     options: [
@@ -23,13 +50,13 @@ const sampleProducts = [
       { name: 'Color', values: ['Classic Blue', 'Washed Black'] }
     ],
     variants: [
-      { options: { Size: 'S', Color: 'Classic Blue' }, stock: 10, price: 129.99, images: [PLACEHOLDER_IMAGE] },
-      { options: { Size: 'M', Color: 'Classic Blue' }, stock: 15, price: 129.99, images: [PLACEHOLDER_IMAGE] },
-      { options: { Size: 'L', Color: 'Classic Blue' }, stock: 12, price: 129.99, images: [PLACEHOLDER_IMAGE] },
-      { options: { Size: 'XL', Color: 'Classic Blue' }, stock: 8, price: 129.99, images: [PLACEHOLDER_IMAGE] },
-      { options: { Size: 'S', Color: 'Washed Black' }, stock: 8, price: 134.99, images: [PLACEHOLDER_IMAGE] },
-      { options: { Size: 'M', Color: 'Washed Black' }, stock: 18, price: 134.99, images: [PLACEHOLDER_IMAGE] },
-      { options: { Size: 'L', Color: 'Washed Black' }, stock: 10, price: 134.99, images: [PLACEHOLDER_IMAGE] },
+      { options: { Size: 'S', Color: 'Classic Blue' }, stock: 10, price: 129.99, images: [placeholderUrl] },
+      { options: { Size: 'M', Color: 'Classic Blue' }, stock: 15, price: 129.99, images: [placeholderUrl] },
+      { options: { Size: 'L', Color: 'Classic Blue' }, stock: 12, price: 129.99, images: [placeholderUrl] },
+      { options: { Size: 'XL', Color: 'Classic Blue' }, stock: 8, price: 129.99, images: [placeholderUrl] },
+      { options: { Size: 'S', Color: 'Washed Black' }, stock: 8, price: 134.99, images: [placeholderUrl] },
+      { options: { Size: 'M', Color: 'Washed Black' }, stock: 18, price: 134.99, images: [placeholderUrl] },
+      { options: { Size: 'L', Color: 'Washed Black' }, stock: 10, price: 134.99, images: [placeholderUrl] },
     ],
   },
   {
@@ -39,7 +66,7 @@ const sampleProducts = [
     category: 'T-Shirts',
     tags: ['Basics', 'Pima Cotton', 'Essential'],
     basePrice: 45.00,
-    images: [PLACEHOLDER_IMAGE],
+    images: [placeholderUrl],
     vendor: VENDOR_ID,
     isActive: true,
     options: [
@@ -62,7 +89,7 @@ const sampleProducts = [
     category: 'Pants',
     tags: ['Performance', 'Travel', 'Chinos', 'Water-Resistant'],
     basePrice: 98.00,
-    images: [PLACEHOLDER_IMAGE],
+    images: [placeholderUrl],
     vendor: VENDOR_ID,
     isActive: true,
     options: [
@@ -86,7 +113,7 @@ const sampleProducts = [
     basePrice: 75.50,
     // This is a simple product with no variants
     stock: 50,
-    images: [PLACEHOLDER_IMAGE],
+    images: [placeholderUrl],
     vendor: VENDOR_ID,
     isActive: true,
   }
@@ -101,6 +128,10 @@ const seedDB = async () => {
     await connectDatabase(mongoURI);
     console.log('Database connected for seeding...');
 
+    // 1. Upload the placeholder image and get the URL
+    const placeholderUrl = await uploadPlaceholderImage();
+
+    // 2. Check for the vendor
     const vendor = await User.findById(VENDOR_ID);
     if (!vendor) {
       throw new Error(`Vendor with ID "${VENDOR_ID}" not found.`);
@@ -109,10 +140,14 @@ const seedDB = async () => {
       throw new Error(`User with ID "${VENDOR_ID}" is not a vendor.`);
     }
 
-    // Clear existing products for this vendor to avoid duplicates
+    // 3. Clear existing products for this vendor to avoid duplicates
     const { deletedCount } = await Product.deleteMany({ vendor: VENDOR_ID });
     console.log(`Cleared ${deletedCount} old products for vendor ${vendor.name}.`);
 
+    // 4. Create the product data with the new placeholder URL
+    const sampleProducts = createSampleProducts(placeholderUrl);
+
+    // 5. Insert the new products
     await Product.insertMany(sampleProducts);
     console.log(`${sampleProducts.length} products have been successfully created for vendor ${vendor.name}!`);
 

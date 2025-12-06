@@ -10,7 +10,13 @@ const VariantSchema = new mongoose.Schema({
   sku: { type: String, required: false, unique: true, sparse: true }, // Stock Keeping Unit
   stock: { type: Number, required: true, min: 0, default: 0 },
   price: { type: Number, required: true }, // Optional: if different from base price
-  images: { type: [String], default: [] }, // Optional: if variant has its own images
+  images: { 
+    type: [{
+      url: { type: String, required: true },
+      publicId: { type: String, required: true }
+    }], 
+    default: [] 
+  }, // Optional: if variant has its own images
 }, { _id: false });
 
 const ProductSchema = new mongoose.Schema({
@@ -32,7 +38,13 @@ const ProductSchema = new mongoose.Schema({
   variants: { type: [VariantSchema], default: [] },
   
   // Media
-  images: { type: [String], default: [] },
+  images: { 
+    type: [{
+      url: { type: String, required: true },
+      publicId: { type: String, required: true }
+    }], 
+    default: [] 
+  },
 
   // Ownership & Status
   vendor: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Changed ref to 'User'

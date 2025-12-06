@@ -53,7 +53,7 @@ export const mapProductToItem = (product) => {
     title: product.name,
     subtitle: product.description.substring(0, 50) + '...', // Create a subtitle
     image: product.images && product.images.length > 0 
-      ? `${API_BASE_URL}${product.images[0]}`
+      ? product.images[0].url
       : 'https://via.placeholder.com/800x1200', // Placeholder
     tags: product.tags || [],
     category: product.category,

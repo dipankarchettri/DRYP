@@ -1,6 +1,7 @@
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
+const cloudinary = require('../config/cloudinary');
+
+// @route   POST /api/products
 const Product = require('../models/Product');
 const Like = require('../models/Like');
 const Cart = require('../models/Cart');
@@ -160,6 +161,37 @@ router.put('/:id', protect, async (req, res, next) => {
       return res.status(401).json({ message: 'Not authorized to edit this product' });
     }
 
+    // === Cloudinary Image Cleanup Logic ===
+    // If the update includes a new set of images, we need to find and delete the old ones.
+    if (req.body.images || req.body.variants) {
+      const existingPublicIds = new Set();
+      product.images.forEach(img => existingPublicIds.add(img.publicId));
+      product.variants.forEach(v => v.images.forEach(img => existingPublicIds.add(img.publicId)));
+
+      const incomingPublicIds = new Set();
+      if (req.body.images) {
+        req.body.images.forEach(img => incomingPublicIds.add(img.publicId));
+      }
+      if (req.body.variants) {
+        req.body.variants.forEach(v => {
+          if(v.images) v.images.forEach(img => incomingPublicIds.add(img.publicId));
+        });
+      }
+
+      // Find which publicIds were removed
+      const idsToDelete = [...existingPublicIds].filter(id => !incomingPublicIds.has(id));
+
+      if (idsToDelete.length > 0) {
+        console.log(`Deleting ${idsToDelete.length} orphaned images from Cloudinary.`);
+        // Asynchronously delete from Cloudinary
+        cloudinary.api.delete_resources(idsToDelete, (error, result) => {
+          if (error) console.error('Error deleting orphaned images from Cloudinary:', error);
+          else console.log('Successfully deleted orphaned images:', result);
+        });
+      }
+    }
+    // === End Cleanup Logic ===
+
     const updatedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
@@ -193,21 +225,33 @@ router.delete('/:id', protect, async (req, res, next) => {
 
     const productId = product._id;
 
-    // 1. Delete images from the filesystem
+    // 1. Collect all Cloudinary public IDs from the product and its variants
+    const publicIds = [];
     if (product.images && product.images.length > 0) {
-      product.images.forEach(imageUrl => {
-        // url is like '/uploads/image-123.jpg', we need the relative path from the project root
-        const imagePath = path.join(__dirname, '..', 'public', imageUrl);
-        fs.unlink(imagePath, (err) => {
-          if (err) {
-            // Log the error but don't block the process. The file might already be gone.
-            console.error(`Failed to delete image: ${imagePath}`, err);
-          }
-        });
+      product.images.forEach(image => publicIds.push(image.publicId));
+    }
+    if (product.variants && product.variants.length > 0) {
+      product.variants.forEach(variant => {
+        if (variant.images && variant.images.length > 0) {
+          variant.images.forEach(image => publicIds.push(image.publicId));
+        }
       });
     }
 
-    // 2. Delete from all carts
+    // 2. Delete images from Cloudinary
+    if (publicIds.length > 0) {
+      // Use cloudinary.api.delete_resources to delete multiple images
+      await cloudinary.api.delete_resources(publicIds, (error, result) => {
+        if (error) {
+          // Log the error but continue with the deletion process
+          console.error('Cloudinary deletion error:', error);
+        } else {
+          console.log('Cloudinary deletion result:', result);
+        }
+      });
+    }
+
+    // 3. Delete from all carts
     await Cart.updateMany({}, { $pull: { items: { product: productId } } });
 
     // 3. Delete from all wishlists

@@ -74,7 +74,9 @@ const ImageCropper = React.forwardRef<ImageCropperRef, ImageCropperProps>(({ ima
     <div className="fixed inset-0 bg-black bg-opacity-75 flex flex-col items-center justify-center z-50">
       <div className="max-w-4xl w-full p-4">
         <ReactCrop crop={crop} onChange={(c) => setCrop(c)}>
-          // eslint-disable-next-line @next/next/no-img-element
+
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {/* Using <img> instead of <Image /> because react-image-crop requires HTMLImageElement for cropping operations */}
           <img ref={imgRef} src={image} alt="Crop preview" />
         </ReactCrop>
       </div>

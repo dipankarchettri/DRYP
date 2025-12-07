@@ -137,4 +137,48 @@ router.get('/:id', protect, async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
+// @route   PUT /api/orders/:id/status
+// @desc    Update order status
+// @access  Private (Vendor only)
+router.put('/:id/status', protect, async (req, res, next) => {
+  try {
+    if (req.user.role !== 'vendor') {
+      return res.status(403).json({ message: 'Forbidden: Only vendors can update status' });
+    }
+
+    const { status } = req.body;
+    if (!status) {
+      return res.status(400).json({ message: 'Status is required' });
+    }
+    
+    const validStatuses = ['confirmed', 'processing', 'shipped', 'out_for_delivery', 'delivered', 'cancelled'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: 'Invalid status' });
+    }
+
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    // Check if the vendor is associated with this order
+    const isVendorAssociated = order.items.some(item => item.vendor.toString() === req.user._id.toString());
+    if (!isVendorAssociated) {
+      return res.status(403).json({ message: 'Forbidden: You are not associated with this order' });
+    }
+
+    order.status = status;
+    const updatedOrder = await order.save();
+    
+    // Optionally, you can repopulate the fields if you need to send the full order back
+    const populatedOrder = await Order.findById(updatedOrder._id)
+      .populate('user', 'name email')
+      .populate('items.product', 'name sku');
+
+    res.json(populatedOrder);
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;
